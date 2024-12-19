@@ -1,11 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Container, Box, Typography, TextField, Button, Link, colors } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import imgLogin from '../assets/imageLogin.png'
 import logo from '../assets/logo.png'
 
+import { useNavigate } from 'react-router-dom';
+
+import { login } from '../services/authService';
+
 const Login = () => {
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(username, password);
+      navigate('/booking');
+    } catch (error) {
+      setError('Credenciales incorrectas');
+    }
+  };
+
+
+
   return (
     <Grid
       container
@@ -41,39 +63,49 @@ const Login = () => {
             Login into Reservations
           </Typography>
 
-          <TextField
-            label="Email address"
-            type="email"
-            variant="outlined"
-            margin="normal"
-            fullWidth
-          />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            margin="normal"
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            fullWidth
-            style={{ marginTop: '20px', background: 'rgb(255, 87, 34)' }}
-          >
-            SIGN IN
-          </Button>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Email address"
+              type="text"
+              variant="outlined"
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+            />
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <Button
+              type='submit'
+              variant="contained"
+              color="primary"
+              size="large"
+              fullWidth
+              style={{ marginTop: '20px', background: 'rgb(255, 87, 34)' }}
+            >
+              SIGN IN
+            </Button>
+          </form>
         </Container>
         <Box>
           <Box display="flex" justifyContent="center" marginTop="20px">
             <Typography variant="body2">
               Do you have an account?{' '}
-              <Link href="register/" 
-                    color="primary" 
-                    style={{ color: 
-                    'rgb(255, 87, 34)', 
-                    textDecoration: 'none' }}>
+              <Link href="register/"
+                color="primary"
+                style={{
+                  color:
+                    'rgb(255, 87, 34)',
+                  textDecoration: 'none'
+                }}>
                 Sing up
               </Link>
             </Typography>
@@ -81,10 +113,10 @@ const Login = () => {
 
           <Box>
             <Typography variant="body2"
-                        align="center" 
-                        color="textSecondary"
-                        
-                        >
+              align="center"
+              color="textSecondary"
+
+            >
               ©2024 Reservations - By Dev. Project
             </Typography>
           </Box>
