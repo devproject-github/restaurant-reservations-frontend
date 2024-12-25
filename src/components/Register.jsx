@@ -1,5 +1,6 @@
-import React from 'react';
-import { Container, Box, Typography, TextField, Button, Link, colors } from '@mui/material';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Container, Box, Typography, TextField, Button, Link, colors, Alert } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import imgLogin from '../assets/imageLogin.png'
@@ -8,6 +9,47 @@ import logo from '../assets/logo.png'
 const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 const Register = () => {
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleUsernameChange = (e) => { setUsername(e.target.value); };
+  const handleEmailChange = (e) => { setEmail(e.target.value); };
+  const handlePasswordChange = (e) => { setPassword(e.target.value); };
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // Manejo del envío del formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/auth/register/", { username, email,
+        password,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(response);
+      setSuccess(response.data.message);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setSuccess("Usuario creado exitosamente");
+      setLoading(false);
+    }
+  };
+
+
+
+
+
   return (
     <Grid
       container
@@ -21,6 +63,8 @@ const Register = () => {
       <Grid item xs={12} md={5}>
         <Container
           className='container-form-login'
+          component="form"
+          onSubmit={handleSubmit}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -43,10 +87,14 @@ const Register = () => {
           >
             Create account
           </Typography>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
 
           <TextField
-            label="Name"
+            label="Username"
             type="text"
+            value={username}
+            onChange={handleUsernameChange}
             variant="outlined"
             margin="normal"
             fullWidth
@@ -55,44 +103,53 @@ const Register = () => {
           <TextField
             label="Email address"
             type="email"
-            variant="outlined"
-            margin="normal"
-            fullWidth
-          />
-          <TextField
-            label="Password"
-            type="password"
+            value={email}
+            onChange={handleEmailChange}
             variant="outlined"
             margin="normal"
             fullWidth
           />
 
-          <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            variant="outlined"
+            margin="normal"
+            fullWidth
+          />
+
+          <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Checkbox {...label} />
-            <Typography sx={{color: 'rgba(0,0,0,.5)'}}>
-            I agree to the Terms & Conditions
+            <Typography sx={{ color: 'rgba(0,0,0,.5)' }}>
+              I agree to the Terms & Conditions
             </Typography>
           </Container>
 
           <Button
+            type="submit"
             variant="contained"
             color="primary"
             size="large"
             fullWidth
             style={{ marginTop: '20px', background: 'rgb(255, 87, 34)' }}
           >
-            CREATE ACCOUNT
+            {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
           </Button>
+
         </Container>
         <Box>
           <Box display="flex" justifyContent="center" marginTop="20px">
             <Typography variant="body2">
               Already have an account?{' '}
-              <Link href="/" 
-                    color="primary" 
-                    style={{ color: 
-                    'rgb(255, 87, 34)', 
-                    textDecoration: 'none' }}>
+              <Link href="/"
+                color="primary"
+                style={{
+                  color:
+                    'rgb(255, 87, 34)',
+                  textDecoration: 'none'
+                }}>
                 Sing in
               </Link>
             </Typography>
@@ -100,10 +157,10 @@ const Register = () => {
 
           <Box>
             <Typography variant="body2"
-                        align="center" 
-                        color="textSecondary"
-                        
-                        >
+              align="center"
+              color="textSecondary"
+
+            >
               ©2024 Reservations - By Dev. Project
             </Typography>
           </Box>
